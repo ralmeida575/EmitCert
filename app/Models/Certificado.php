@@ -11,6 +11,7 @@ class Certificado extends Model
     use HasFactory;
 
     protected $fillable = [
-        'nome', 'curso', 'carga_horaria', 'email', 'certificado_path'
+        'nome', 'cpf', 'curso', 'carga_horaria', 'email', 'certificado_path',
+        'data_emissao', 'data_conclusao', 'qr_code_path', 'hash', 'unidade'
     ];
 }
