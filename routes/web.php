@@ -1,17 +1,26 @@
 <?php
 
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ControllerCert;
 
+// Página inicial protegida por autenticação
 Route::get('/', function () {
-    return view('index'); // Página inicial
+    return view('index');
+})->middleware('auth');
+
+// Página de verificação do certificado (pública)
+Route::get('/verificar_certificado/{hash}', [ControllerCert::class, 'validarCertificado']);
+
+// Página para gerar certificados (protegida por autenticação)
+Route::post('/gerar-certificados', [ControllerCert::class, 'gerarCertificados'])
+    ->middleware('auth');
+
+// Rotas autenticadas para perfil
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// Rota para verificar certificados
-Route::get('/verificar-certificado/{certificado}', [ControllerCert::class, 'verificarCertificado']);
-
-// Rota para gerar certificados
-Route::post('/gerar_certificados', [ControllerCert::class, 'gerarCertificados']);
-
-// Rota para exibir a lista de certificados gerados
-Route::get('/certificados', [ControllerCert::class, 'exibirCertificados']);
+require __DIR__.'/auth.php';

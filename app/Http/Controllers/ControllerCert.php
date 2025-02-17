@@ -65,7 +65,10 @@ $dataConclusao = trim($linha[4]); // Data Conclusão
 
 // Remover qualquer ponto, traço ou barra do CPF
 $cpfNumerico = preg_replace('/\D/', '', $cpf);
+<<<<<<< HEAD
 Log::info('CPF formatado', ['cpf' => $cpfNumerico]);
+=======
+>>>>>>> 3fd43c9c03f8177bb0e5bff5a213da0373cbe19d
 if (strlen($cpfNumerico) !== 11) {
 Log::warning('CPF inválido', ['cpf' => $cpf]);
 continue;
@@ -101,8 +104,12 @@ $linha[3], // Carga Horária
 $dataConclusao, // Data Conclusão
 $linha[5], // Unidade
 $qrCodeUrl, // URL do QR Code
+<<<<<<< HEAD
 $templatePath,
 
+=======
+$templatePath
+>>>>>>> 3fd43c9c03f8177bb0e5bff5a213da0373cbe19d
 );
 
 if (!$outputPath) {
@@ -114,8 +121,13 @@ continue;
 $certificado = Certificado::create([
 'nome' => $linha[0],
 'cpf' => $cpfNumerico, // Usando o CPF numérico
+<<<<<<< HEAD
 'email' => $linha[2], // Ajuste conforme necessário
 'curso' => $linha[1],
+=======
+'email' => $linha[1], // Ajuste conforme necessário
+'curso' => $linha[2],
+>>>>>>> 3fd43c9c03f8177bb0e5bff5a213da0373cbe19d
 'carga_horaria' => $linha[3],
 'unidade'=>$linha[5],
 'data_emissao' => now(),
@@ -190,19 +202,29 @@ Carbon::setLocale('pt_BR');
 $dataConclusao = Carbon::parse($dataConclusao);
 $dataFormatada = $dataConclusao->translatedFormat('j \d\e F \d\e Y');
 $pdf->SetXY(17.2, 89);
+<<<<<<< HEAD
 $pdf->Cell(262.6, 24.2, "Participou do Curso de " . $curso . " realizado de forma presencial no dia " . $dataFormatada, 0, 1, 'C');
+=======
+$pdf->Cell(262.6, 24.2, "participou do " . $curso . " realizado de forma presencial no dia " . $dataFormatada, 0, 1, 'C');
+>>>>>>> 3fd43c9c03f8177bb0e5bff5a213da0373cbe19d
 $pdf->SetXY(17.2, 98, $pdf->GetY());
 $pdf->Cell(262.6, 24.2, "na Faculdade Sao Leopoldo Mandic - " . $unidade, 0, 1, 'C');
 
 // Inserindo o QR Code
 $pdf->Image($qrCodePath, 245, 160, 35, 35); // Usando o arquivo do QR Code
+<<<<<<< HEAD
 // Ajustando a posição para o Hash abaixo do QR Code
+=======
+>>>>>>> 3fd43c9c03f8177bb0e5bff5a213da0373cbe19d
 
 // Gerar o caminho do certificado PDF
 $outputPath = "$certificadosDir/certificado-" . uniqid() . ".pdf";
 $pdf->Output('F', $outputPath);
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 3fd43c9c03f8177bb0e5bff5a213da0373cbe19d
 // Remover o arquivo temporário do QR Code
 unlink($qrCodePath);
 
@@ -230,4 +252,9 @@ return view('validar-certificado', [
 'certificado' => $certificado
 ]);
 }
+<<<<<<< HEAD
 }
+=======
+}
+
+>>>>>>> 3fd43c9c03f8177bb0e5bff5a213da0373cbe19d
