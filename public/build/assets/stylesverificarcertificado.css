@@ -1,0 +1,83 @@
+body {
+    background-color: #252f67; /* Fundo azul */
+    color: white; /* Cor do texto */
+    font-family: 'Times New Roman', serif; /* Fonte apropriada para documentos */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+/* Estilização do container */
+.container {
+    background-color: #252f67; /* Fundo azul */
+    box-shadow: 0px 4px 15px rgba(255, 215, 0, 0.6); /* Sombra dourada */
+    padding: 40px;
+    border-radius: 10px;
+    text-align: center;
+    width: 700px; /* Largura adequada para um diploma */
+    height: auto; /* Altura automática */
+    position: relative; /* Necessário para a marca d'água */
+}
+
+/* Estilização da marca d'água */
+.marca-dagua {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSqllfNihEGukGwfcxEQ1PBGViCreJ3zwJHow&s') no-repeat center center;
+    background-size: contain;
+    opacity: 0.1; /* Transparência da marca d'água */
+}
+
+/* Estilização da logo */
+.logo {
+    max-width: 160px; /* Ajustar tamanho da logo */
+    height: auto;
+    margin-bottom: 40px;
+}
+
+/* Estilização dos textos */
+h1 {
+    font-size: 28px; /* Tamanho da fonte para o título */
+    margin-bottom: 10px;
+}
+
+.texto {
+    font-size: 20px; /* Tamanho da fonte para os textos */
+    margin: 10px 0;
+}
+
+.nome {
+    font-size: 24px; /* Tamanho da fonte para o nome */
+    font-weight: bold;
+    margin: 20px 0;
+}
+
+/* Estilização do rodapé */
+.rodape {
+    margin-top: 20px;
+    font-size: 16px; /* Tamanho do texto do rodapé */
+}
+
+/* Estilização do botão */
+button {
+    padding: 10px 20px;
+    font-size: 16px; /* Aumentar o tamanho da fonte */
+    width: 100%;
+    max-width: 250px;
+    margin-top: 20px;
+    border-radius: 5px;
+    background-color: #007BFF; /* Azul */
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out;
+}
+
+button:hover {
+    background-color: #0056b3; /* Tom mais escuro para hover */
+}

@@ -1,0 +1,268 @@
+/* Estilização do body */
+body {
+    background-color: #252f67;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.header {
+    
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Estilização do container */
+.container {
+    display: flex;
+    flex-direction: column;
+    background-color: #252f67;
+    box-shadow: 0px 2px 5px rgba(255, 255, 255, 0.3);
+    padding: 15px; /* Reduzido para 20px, ajuste conforme necessário */
+    border-radius: 10px;
+    text-align: center;
+    width: 90%;
+    max-width:500px; /* Mantido */
+    margin: 0 auto; /* Centraliza o container */
+    font-family: Arial, sans-serif;  /* Exemplo de fonte */
+    font-size: 14px;
+}
+
+/* Estilização da logo */
+.logo {
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 20px;
+}
+
+/* Estilização dos rótulos */
+label {
+    display: block;
+    margin: 15px 0 5px;
+    font-weight: bold;
+    
+}
+
+/* Estilização do input de arquivo */
+input[type="file"] {
+    display: none; /* Esconde o input real */
+}
+
+.file-label {
+    display: inline-block;
+    padding: 12px 20px;
+    background-color: #1A202C; /* Azul */
+    color: white;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s ease-in-out;
+    margin-bottom: 15px;
+    text-align: center;
+    max-width: 250px;
+    width: 100%;
+}
+
+.file-label:hover {
+    background-color: #4A5568;
+}
+
+/* Estilização do dropdown */
+select {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    width: 100%;
+    max-width: 250px;
+    background-color: #fff;
+    color: #000000;
+    font-size: 16px;
+    margin-bottom: 15px;
+    font-family: Arial, sans-serif;  /* Exemplo de fonte */
+    font-size: 14px;
+}
+
+/* Estilização do botão */
+button {
+    padding: 8px 16px;
+    font-size: 14px;
+    width: 100%;
+    max-width: 250px;
+    margin-top: 20px;
+    border-radius: 5px;
+    background-color: #1A202C;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out;
+    font-family: Arial, sans-serif;  /* Exemplo de fonte */
+    font-size: 14px;
+}
+
+button:hover {
+    background-color: #4A5568;
+}
+
+/* Estilização do carregador */
+#loading {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #252f67; 
+    box-shadow: 0px 2px 5px rgba(255, 255, 255, 0.2);
+    color: #ffffff; 
+    padding: 20px;
+    border-radius: 8px;
+    z-index: 10000;
+    text-align: center;
+    min-width: 200px;
+  }
+
+.spinner {
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-top: 4px solid #d6ad0a;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    animation: spin 0.6s linear infinite;
+    margin: 0 auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Estilização das mensagens de retorno */
+.alert {
+    padding: 12px;
+    border-radius: 5px;
+    text-align: center;
+    font-weight: bold;
+    position: fixed;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    min-width: 300px;
+    display: none;
+    opacity: 1;
+    transition: opacity 0.5s ease-in-out;
+}
+
+.alert-success {
+    background-color: #28a745; /* Verde */
+    color: white;
+}
+
+.alert-error {
+    background-color: #dc3545; /* Vermelho */
+    color: white;
+}
+
+/* Animação para sumir após 10 segundos */
+.alert.fade-out {
+    opacity: 0;
+}
+
+.alert-container {
+    margin-top: 15px; /* Dá um espaço entre o botão e a mensagem */
+}
+
+a.logout-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    color: white !important; /* Mantém a cor branca */
+    background: none;
+    border: none;
+    text-decoration: none;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 8px 12px;
+    font-size: 16px; /* Ajusta o tamanho da fonte */
+    font-family: Arial, sans-serif;  
+      
+}
+
+a.logout-btn:hover {
+    background: none !important; 
+    text-decoration: underline; 
+}
+.success-message {
+    display: block;
+    background-color: #28a745; /* Verde */
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+    margin-top: 20px;
+    font-weight: bold;
+    width: 100%; /* Mantido */
+    max-width: 250px; /* Mantido */
+    margin-left: auto; 
+    margin-right: auto; 
+}
+.large-title {
+    font-size: 2rem; /* Ajuste o tamanho conforme necessário */
+    color: white;
+    font-weight: bold; /* Para deixar em negrito */
+    margin-top: 0; /* Remove margem superior */
+}
+.notification-container {
+    position: fixed;
+    top: 80px;
+    right: 20px;    
+    width: 350px;
+    background-color:#252f67;
+    border: 2px;
+    box-shadow: 0 2px 8px rgba(116, 235, 48, 0.545);
+    padding: 15px;
+    z-index: 9999;
+    border-radius: 5px;
+    display: none; /* Começa oculto */
+    color: rgb(255, 255, 255);
+    font-family: Arial, sans-serif;  /* Exemplo de fonte */
+    font-size: 12px;
+}
+
+
+
+.close-notification {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: transparent;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+}
+#error-container {
+    position: fixed;
+    top: 150px; 
+    right: 20px;
+    width: 350px; /* Largura fixa */
+    max-height: calc(100vh - 220px); /* 100vh menos o valor do top + margem */
+    background-color: #252f67;
+    border: 2px;
+    box-shadow: 0 2px 8px rgba(214, 21, 21, 0.64);
+    padding: 15px;
+    z-index: 9999;
+    border-radius: 5px;
+    display: none; 
+    color: #fff;
+    overflow-y: auto; /* Habilita o scroll vertical se necessário */
+    font-family: Arial, sans-serif;  /* Exemplo de fonte */
+    font-size: 12px;
+}
