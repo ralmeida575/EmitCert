@@ -72,13 +72,13 @@
 </head>
 <body>
   <div class="container">
-    <!-- Cabeçalho com logo -->
+   
     <div class="header">
         <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSqllfNihEGukGwfcxEQ1PBGViCreJ3zwJHow&s" alt="Logo" class="logo">
         <h1>Faculdade São Leopoldo Mandic</h1>
     </div>
 
-    <!-- Conteúdo -->
+    
     <div class="content">
       <h2>Olá, {{ $nome }}!</h2>
       <p>Parabéns por concluir o curso de <strong>{{ $curso }}</strong> com excelência!</p>
@@ -88,7 +88,7 @@
       <small>Essa mesma <b>página</b> pode ser acessada posteriormente escaneando o QR Code impresso no certificado PDF.</small>
     </div>
 
-    <!-- Rodapé -->
+   
     <div class="footer">
       <p>© {{ date('Y') }} Faculdade São Leopoldo Mandic. Todos os direitos reservados.</p>
     </div>
