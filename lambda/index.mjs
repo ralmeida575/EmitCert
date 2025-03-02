@@ -15,7 +15,7 @@ async function processMessages() {
   while (true) {
     const command = new ReceiveMessageCommand({
       QueueUrl: queueUrl,
-      MaxNumberOfMessages: 1,
+      MaxNumberOfMessages: 1, 
       WaitTimeSeconds: 5,
     });
 
@@ -24,21 +24,35 @@ async function processMessages() {
 
       if (response.Messages && response.Messages.length > 0) {
         for (const message of response.Messages) {
-          console.log("📩 Mensagem recebida:", message.Body);
+          try {
+            console.log("📩 Mensagem bruta recebida:", message.Body);
+            
+            // Parseia o JSON corretamente
+            const body = JSON.parse(message.Body);
 
-          await sqs.send(new DeleteMessageCommand({
-            QueueUrl: queueUrl,
-            ReceiptHandle: message.ReceiptHandle,
-          }));
+            if (body.data?.command) {
+              console.log("✅ Comando extraído:", body.data.command);
+            } else {
+              console.log("⚠️ Mensagem recebida, mas sem comando válido.");
+            }
 
-          console.log("✅ Mensagem processada e removida da fila!");
+            // Remover a mensagem da fila após processar
+            await sqs.send(new DeleteMessageCommand({
+              QueueUrl: queueUrl,
+              ReceiptHandle: message.ReceiptHandle,
+            }));
+
+            console.log("✅ Mensagem processada e removida da fila!");
+          } catch (error) {
+            console.error("❌ Erro ao processar mensagem:", error);
+          }
         }
       } else {
         console.log("Nenhuma mensagem na fila.");
         await new Promise(resolve => setTimeout(resolve, 5000)); // Aguarda 5 segundos antes de tentar de novo
       }
     } catch (error) {
-      console.error("❌ Erro ao processar mensagens:", error);
+      console.error("❌ Erro ao buscar mensagens na fila:", error);
     }
   }
 }

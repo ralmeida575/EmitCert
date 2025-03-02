@@ -14,7 +14,6 @@ class EnviarParaSQS implements ShouldQueue
 {
     use Dispatchable, Queueable, InteractsWithQueue, SerializesModels;
 
-    public $queue = 'sqs'; // Garante que o Laravel coloque na fila correta
     public $messageBody;
 
     /**
