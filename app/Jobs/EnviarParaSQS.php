@@ -5,60 +5,53 @@ namespace App\Jobs;
 use Aws\Sqs\SqsClient;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Bus\Dispatchable;
 
 class EnviarParaSQS implements ShouldQueue
 {
     use Dispatchable, Queueable, InteractsWithQueue, SerializesModels;
 
-    public $queueUrl;
+    public $queue = 'sqs'; // Garante que o Laravel coloque na fila correta
     public $messageBody;
 
     /**
      * Create a new job instance.
      *
-     * @param  string  $queueUrl
      * @param  array  $messageBody
-     * @return void
      */
-    public function __construct($queueUrl, $messageBody)
+    public function __construct($messageBody)
     {
-        $this->queueUrl = $queueUrl;
         $this->messageBody = $messageBody;
     }
 
     /**
      * Execute the job.
-     *
-     * @return void
      */
     public function handle()
     {
         try {
-            // Cria o cliente do SQS com o endpoint do LocalStack
+            // Configuração do cliente SQS
             $sqsClient = new SqsClient([
-                'version' => 'latest',
-                'region' => env('AWS_DEFAULT_REGION'),
-                'endpoint' => env('AWS_SQS_ENDPOINT'),
+                'version'     => 'latest',
+                'region'      => config('queue.connections.sqs.region', 'us-east-1'),
+                'endpoint'    => config('queue.connections.sqs.endpoint', 'http://localhost:9324'),
                 'credentials' => [
-                    'key'    => env('AWS_ACCESS_KEY_ID'),
-                    'secret' => env('AWS_SECRET_ACCESS_KEY'),
+                    'key'    => config('queue.connections.sqs.key', 'test'),
+                    'secret' => config('queue.connections.sqs.secret', 'test'),
                 ]
             ]);
 
-            // Envia a mensagem para o SQS
+            // Envia a mensagem para a fila configurada no Laravel
             $result = $sqsClient->sendMessage([
-                'QueueUrl' => $this->queueUrl,
+                'QueueUrl'    => config('queue.connections.sqs.queue', 'http://localhost:9324/000000000000/certificados'),
                 'MessageBody' => json_encode($this->messageBody),
             ]);
 
-            // Log de sucesso (opcional)
             Log::info('Mensagem enviada para o SQS', ['messageId' => $result->get('MessageId')]);
         } catch (\Exception $e) {
-            // Log de erro (opcional)
             Log::error('Erro ao enviar mensagem para o SQS', ['error' => $e->getMessage()]);
         }
     }

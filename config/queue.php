@@ -32,14 +32,16 @@
             ],
 
             
-          'sqs' => [
+'sqs' => [
     'driver' => 'sqs',
-    'key' => env('AWS_ACCESS_KEY_ID'),
-    'secret' => env('AWS_SECRET_ACCESS_KEY'),
-    'prefix' => env('AWS_SQS_QUEUE'),
+    'key' => env('AWS_ACCESS_KEY_ID', 'key'),
+    'secret' => env('AWS_SECRET_ACCESS_KEY', 'secret'),
+    'prefix' => env('AWS_SQS_ENDPOINT') . '/000000000000', 
     'queue' => env('AWS_SQS_QUEUE'),
-    'region' => env('AWS_DEFAULT_REGION'),
-    'endpoint' => env('AWS_SQS_ENDPOINT'),  
+    'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
+    'suffix' => '',
+    'endpoint' => env('AWS_SQS_ENDPOINT'),
+    'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', true),
 ],
 
 

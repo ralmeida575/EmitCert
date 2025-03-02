@@ -11,7 +11,6 @@
 </head>
 <body class="font-sans">
 
-  
     <div id="notification-container" class="notification-container" style="display:none;">
 
     <div id="notification-content"></div>

@@ -17,10 +17,31 @@ use Carbon\Carbon;
 use App\Models\EmissaoCertificadoArquivo;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\CertificadoEnviado;
+use Aws\Sqs\SqsClient;
+
 
 
 class ControllerCert extends Controller
 {
+    private $sqsClient;
+    private $queueUrl;
+    private $uuidArquivo;
+
+    public function __construct()
+    {
+        $this->sqsClient = new SqsClient([
+            'version' => 'latest',
+            'region'  => env('AWS_DEFAULT_REGION', 'us-east-1'),
+            'endpoint' => env('AWS_SQS_ENDPOINT', 'http://localhost:9324'),
+            'credentials' => [
+                'key'    => env('AWS_ACCESS_KEY_ID', 'test'),
+                'secret' => env('AWS_SECRET_ACCESS_KEY', 'test'),
+            ],
+        ]);
+        
+        $this->queueUrl = env('AWS_SQS_QUEUE', 'http://localhost:9324/000000000000/certificados');
+    }
+
     public function gerarCertificados(Request $request)
     {
         $request->validate([
@@ -96,6 +117,7 @@ class ControllerCert extends Controller
                 $concatenacao = $cpfNumerico . $dataConclusao;
                 $hash = md5($concatenacao);
                 $qrCodeUrl = url('/verificar_certificado/' . $hash);
+                $uuidArquivo = (string) \Str::uuid();
     
                 $outputPath = $this->gerarCertificadoPdf(
                     $linha[0], 
@@ -123,6 +145,7 @@ class ControllerCert extends Controller
                     Log::info('E-mail enviado para: ' . $linha[2]);
     
                     Certificado::create([
+
                         'nome' => $linha[0],
                         'cpf' => $cpfNumerico,
                         'email' => $linha[2],
@@ -135,6 +158,16 @@ class ControllerCert extends Controller
                         'certificado_path' => $outputPath,
                         'hash' => $hash,
                     ]);
+
+                    $this->enviarParaSqs([
+                        'nome' => $linha[0],
+                        'curso' => $linha[1],
+                        'carga_horaria' => $linha[3],
+                        'cpf' => $cpfNumerico,
+                        'data_conclusao' => $dataConclusao->format('Y-m-d'),
+                        'arquivo_uuid' => $uuidArquivo,
+                    ]);
+
                     $certificadosGerados[] = ['nome' => $linha[0], 'curso' => $linha[1], 'outputPath' => $outputPath];
                     $quantidadeCertificados++;
                 } catch (\Exception $e) {
@@ -243,5 +276,18 @@ class ControllerCert extends Controller
         $certificado = Certificado::where('hash', $hash)->firstOrFail();
 
         return Storage::disk('s3')->download($certificado->certificado_path);
+    }
+
+    private function enviarParaSqs(array $payload)
+    {
+        try {
+            $result = $this->sqsClient->sendMessage([
+                'QueueUrl' => $this->queueUrl,
+                'MessageBody' => json_encode($payload),
+            ]);
+            Log::info('Mensagem enviada para SQS: ' . json_encode($payload) . ' | MessageId: ' . $result['MessageId']);
+        } catch (\Exception $e) {
+            Log::error('Erro ao enviar mensagem para SQS: ' . $e->getMessage());
+        }
     }
 }
