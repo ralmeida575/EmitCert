@@ -20,7 +20,11 @@ Route::middleware('auth')->group(function () {
 });
 
 
-Route::get('/certificado/{hash}/download', [CertificadoController::class, 'download'])->name('certificados.download');
+Route::get('/certificado/{hash}/download', [ControllerCert::class, 'download'])->name('certificados.download');
+
+use App\Http\Controllers\CertificadoController; // Certifique-se de que o caminho do controlador esteja correto
+
+Route::post('/webhook/certificados-processados', [ControllerCert::class, 'receberWebhook']);
 
 
 require __DIR__.'/auth.php';

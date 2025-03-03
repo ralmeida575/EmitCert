@@ -1,16 +1,17 @@
+import fetch from "node-fetch"; 
 import { SQSClient, ReceiveMessageCommand, DeleteMessageCommand } from "@aws-sdk/client-sqs";
 
-// Configuração do cliente SQS para apontar para o LocalStack
+const LARAVEL_WEBHOOK_URL = "http://localhost:8000/webhook/certificados-processados";
+const queueUrl = "http://localhost:9324/000000000000/certificados";
+
 const sqs = new SQSClient({
   region: "us-east-1",
-  endpoint: "http://localhost:9324", // URL do LocalStack
+  endpoint: "http://localhost:9324", 
   credentials: { accessKeyId: "test", secretAccessKey: "test" }
 });
 
-const queueUrl = "http://localhost:9324/000000000000/certificados";
-
 async function processMessages() {
-  console.log("Aguardando mensagens da fila...");
+  console.log("🚀 Iniciando consumo da fila...");
 
   while (true) {
     const command = new ReceiveMessageCommand({
@@ -25,15 +26,32 @@ async function processMessages() {
       if (response.Messages && response.Messages.length > 0) {
         for (const message of response.Messages) {
           try {
-            console.log("📩 Mensagem bruta recebida:", message.Body);
-            
-            // Parseia o JSON corretamente
+            console.log("📩 Mensagem recebida:", message.Body);
             const body = JSON.parse(message.Body);
 
-            if (body.data?.command) {
-              console.log("✅ Comando extraído:", body.data.command);
+            // Certifique-se de enviar os dados completos esperados pelo Laravel
+            const webhookResponse = await fetch(LARAVEL_WEBHOOK_URL, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                arquivo_uuid: body.id,  // Assumindo que `id` é o `arquivo_uuid` no Laravel
+                nome: body.nome,
+                curso: body.curso,
+                carga_horaria: body.carga_horaria,
+                data_conclusao: body.data_conclusao,
+                unidade: body.unidade,
+                qr_code_url: body.qr_code_url,
+                template_path: body.template_path,
+                hash: body.hash,
+                email: body.email,
+                certificado_path: body.certificado_path
+              }),
+            });
+
+            if (webhookResponse.ok) {
+              console.log("Webhook enviado com sucesso!");
             } else {
-              console.log("⚠️ Mensagem recebida, mas sem comando válido.");
+              console.error("Erro ao enviar para o Laravel:", await webhookResponse.text());
             }
 
             // Remover a mensagem da fila após processar
@@ -42,17 +60,17 @@ async function processMessages() {
               ReceiptHandle: message.ReceiptHandle,
             }));
 
-            console.log("✅ Mensagem processada e removida da fila!");
+            console.log("Mensagem processada e removida da fila!");
           } catch (error) {
-            console.error("❌ Erro ao processar mensagem:", error);
+            console.error("Erro ao processar mensagem:", error);
           }
         }
       } else {
         console.log("Nenhuma mensagem na fila.");
-        await new Promise(resolve => setTimeout(resolve, 5000)); // Aguarda 5 segundos antes de tentar de novo
+        await new Promise(resolve => setTimeout(resolve, 5000));
       }
     } catch (error) {
-      console.error("❌ Erro ao buscar mensagens na fila:", error);
+      console.error("Erro ao buscar mensagens na fila:", error);
     }
   }
 }

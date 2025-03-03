@@ -16,6 +16,7 @@
         "vite": "^5.0.0"
     },
     "dependencies": {
-        "@aws-sdk/client-sqs": "^3.758.0"
+        "@aws-sdk/client-sqs": "^3.758.0",
+        "node-fetch": "^3.3.2"
     }
 }

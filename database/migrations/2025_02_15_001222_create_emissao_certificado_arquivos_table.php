@@ -10,11 +10,12 @@ class CreateEmissaoCertificadoArquivosTable extends Migration
     {
         Schema::create('emissao_certificado_arquivos', function (Blueprint $table) {
             $table->id(); 
+            $table->uuid('arquivo_uuid')->after('id');
             $table->string('nomeArquivo'); 
             $table->integer('qtdeCertificados');
             $table->string('status'); 
 
-            $table->dateTime('dataArquivo');
+            $table->dateTime('dataArquivo');        
             $table->timestamps(); 
         });
     }
