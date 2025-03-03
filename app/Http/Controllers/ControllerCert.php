@@ -230,6 +230,16 @@ class ControllerCert extends Controller
 
     public function receberWebhook(Request $request)
 {
+
+    $data = $request->all();
+
+    $email = $data['email'] ?? null;
+
+    if (!$email) {
+        Log::error('E-mail não encontrado no payload.');
+        return response()->json(['erro' => 'E-mail não encontrado'], 400);
+    }
+
     $qrCodeUrl = $request->input('qr_code_url') ?? Certificado::where('hash', $request->input('hash'))->value('qr_code_path');
 
     if (!$qrCodeUrl) {
@@ -275,7 +285,13 @@ class ControllerCert extends Controller
     Certificado::where('hash', $request->input('hash'))
         ->update(['certificado_path' => $outputPath]);
 
-
+        try {
+            // Enviar o e-mail com o certificado gerado
+            Mail::to($email)->send(new CertificadoEnviado($data['nome'], $data['curso'], $outputPath, $data['hash']));
+            Log::info('E-mail enviado para: ' . $email);
+        } catch (\Exception $e) {
+            Log::error('Erro ao enviar e-mail para ' . $email . ': ' . $e->getMessage());
+        }
         
     return response()->json([
         'message' => 'Certificado gerado e enviado com sucesso!',
