@@ -132,8 +132,6 @@ class ControllerCert extends Controller
         ], 500);
     }
 }
-
-
     private function gerarCertificadoPdf($nomeAluno, $curso, $cargaHoraria, $dataConclusao, $unidade, $qrCodeUrl, $templatePath, $hash)
     {
         try {
