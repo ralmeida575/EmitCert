@@ -15,6 +15,7 @@ class EmissaoCertificadoArquivo extends Model
 
     // Defina os campos que podem ser preenchidos (atributos em massa)
     protected $fillable = [
+        'arquivo_uuid',
         'nomeArquivo',
         'qtdeCertificados',
         'status',

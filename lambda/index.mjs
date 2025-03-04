@@ -34,7 +34,7 @@ async function processMessages() {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
-                arquivo_uuid: body.id,  // Assumindo que `id` é o `arquivo_uuid` no Laravel
+                arquivo_uuid: body.arquivo_uuid, 
                 nome: body.nome,
                 curso: body.curso,
                 carga_horaria: body.carga_horaria,

@@ -121,7 +121,8 @@ class ControllerCert extends Controller
                 $hash = md5($concatenacao);
                 $qrCodeUrl = url('/verificar_certificado/' . $hash);
                 $certificadoPath = storage_path("app/certificados/{$hash}.pdf");
-    
+                $arquivoUuid = (string) Str::uuid();
+
                 $certificado = Certificado::create([
                     'nome' => $linha[0],
                     'cpf' => $cpfNumerico,
@@ -143,13 +144,13 @@ class ControllerCert extends Controller
                 }
     
                 $payload = $certificado->toArray();
+                $payload['arquivo_uuid'] = $arquivoUuid;
                 $this->enviarParaSqs($payload); 
                 $quantidadeCertificados++;
 
             }
-    
             EmissaoCertificadoArquivo::create([
-                'arquivo_uuid' => Str::uuid(),
+                'arquivo_uuid' => $arquivoUuid,
                 'nomeArquivo' => $request->file('file')->getClientOriginalName(),
                 'qtdeCertificados' => $quantidadeCertificados,
                 'status' => 'pendente',
@@ -288,11 +289,14 @@ class ControllerCert extends Controller
 
     Log::info('Webhook recebido:', $request->all());
 
-    $arquivoUuid = $request->input('arquivo_uuid');
+    $arquivoUuid = (string) $request->input('arquivo_uuid');
+    Log::info("UUID recebido: " . $arquivoUuid . " (Tipo: " . gettype($arquivoUuid) . ")");
+    $arquivoUuid = (string) $arquivoUuid;
 
-    Log::info("Atualizando status do arquivo_uuid: {$arquivoUuid}");
-    EmissaoCertificadoArquivo::where('arquivo_uuid', $arquivoUuid)
-        ->update(['status' => 'em_processamento']);
+    $atualizados = EmissaoCertificadoArquivo::where('arquivo_uuid', $arquivoUuid)
+    ->update(['status' => 'em_processamento']);
+
+Log::info("Linhas atualizadas: " . $atualizados);
 
         $templateNome = basename($request->template);
         // O PDF nao é gerado quando recebe o nome do template via request
@@ -304,7 +308,6 @@ class ControllerCert extends Controller
             return response()->json(['erro' => 'Template não encontrado'], 404);
         }
         
-        Log::info("Caminho do template para gerar o certificado: " . $templatePath);
         $outputPath = $this->gerarCertificadoPdf(
         $request->input('nome'),
         $request->input('curso'),
@@ -334,7 +337,7 @@ class ControllerCert extends Controller
         
     return response()->json([
         'message' => 'Certificado gerado e enviado com sucesso!',
-        'path' => $outputPath
+        'path' => $outputPath   
     ], 200);
 }
 
