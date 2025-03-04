@@ -142,9 +142,9 @@ class ControllerCert extends Controller
                     $erros[] = "Linha {$linhaExcel}: Erro ao salvar certificado (" . ($linha[0] ?? 'Nome desconhecido') . ", " . ($linha[1] ?? 'Curso desconhecido') . ")";
                     continue;
                 }
-    
-                $payload = $certificado->toArray();
+
                 $payload['arquivo_uuid'] = $arquivoUuid;
+                $payload = $certificado->toArray();
                 $this->enviarParaSqs($payload); 
                 $quantidadeCertificados++;
 
@@ -208,13 +208,13 @@ class ControllerCert extends Controller
             $pdf->useTemplate($template);
             $pdf->SetFont('Arial', 'B', 32, true);
             $pdf->SetXY(3.38 * 10, 7.15 * 10);
-            $pdf->Cell(22.94 * 10, 1.62 * 10, $nomeAluno, 0, 1, 'C');
+            $pdf->Cell(22.94 * 10, 1.62 * 10, utf8_decode($nomeAluno), 0, 1, 'C');
             $pdf->SetFont('Arial', 'B', 15, true);
             Carbon::setLocale('pt_BR');
             $dataConclusao = Carbon::parse($dataConclusao);
             $dataFormatada = $dataConclusao->translatedFormat('j \d\e F \d\e Y');
             $pdf->SetXY(17.2, 89);
-            $pdf->Cell(262.6, 24.2, "Participou do Curso de " . $curso . " realizado de forma presencial no dia " . $dataFormatada, 0, 1, 'C');
+            $pdf->Cell(262.6, 24.2, "Participou do Curso de " . utf8_decode($curso) . " realizado de forma presencial no dia " . $dataFormatada, 0, 1, 'C');
             $pdf->SetXY(17.2, 92);
             $pdf->SetXY(17.2, 98, $pdf->GetY());
             $pdf->Cell(262.6, 24.2, "na Faculdade Sao Leopoldo Mandic - " . $unidade, 0, 1, 'C');
@@ -256,13 +256,19 @@ class ControllerCert extends Controller
 
     private function enviarParaSqs(array $payload)
     {
-        $payload['qr_code_url'] = $payload['qr_code_path'] ?? null; 
+        if (!is_array($payload)) {
+            Log::error('Erro: Payload não é um array', ['payload' => $payload]);
+            return;
+        }
+
+        $payload['qr_code_url'] = $payload['qr_code_path'] ?? null;
+            
         try {
             $result = $this->sqsClient->sendMessage([
                 'QueueUrl' => $this->queueUrl,
-                'MessageBody' => json_encode($payload),
+                'MessageBody' => json_encode($payload, JSON_UNESCAPED_UNICODE), // UTF-8 correto
             ]);
-            Log::info('Mensagem enviada para SQS: ' . json_encode($payload) . ' | MessageId: ' . $result['MessageId']);
+            Log::info('Mensagem enviada para SQS: ' . json_encode($payload, JSON_UNESCAPED_UNICODE) . ' | MessageId: ' . $result['MessageId']);
         } catch (\Exception $e) {
             Log::error('Erro ao enviar mensagem para SQS: ' . $e->getMessage());
         }
