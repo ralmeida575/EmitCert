@@ -27,7 +27,6 @@ class ControllerCert extends Controller
 {
     private $sqsClient;
     private $queueUrl;
-    private $uuidArquivo;
 
     public function __construct()
     {
@@ -46,6 +45,8 @@ class ControllerCert extends Controller
 
     public function gerarCertificados(Request $request)
     {
+        $templateNome = basename($request->template);
+        Log::info('Nome do template:' . $templateNome);
         $request->validate([
             'file' => 'required|file|mimes:xlsx,xls',
             'template' => 'required|string|in:template_certificado_1.pdf,template_certificado_2.pdf,template_certificado_3.pdf',
@@ -143,8 +144,10 @@ class ControllerCert extends Controller
                     continue;
                 }
 
-                $payload['arquivo_uuid'] = $arquivoUuid;
+                
                 $payload = $certificado->toArray();
+                $payload['arquivo_uuid'] = $arquivoUuid;
+                $payload['template_nome'] = $templateNome;
                 $this->enviarParaSqs($payload); 
                 $quantidadeCertificados++;
 
@@ -276,6 +279,9 @@ class ControllerCert extends Controller
 
     public function receberWebhook(Request $request)
 {
+ 
+    $templateNome = $request->input('template_nome');
+    Log::info("Template nome final: " . $templateNome);
 
     $data = $request->all();
 
@@ -302,12 +308,7 @@ class ControllerCert extends Controller
     $atualizados = EmissaoCertificadoArquivo::where('arquivo_uuid', $arquivoUuid)
     ->update(['status' => 'em_processamento']);
 
-Log::info("Linhas atualizadas: " . $atualizados);
-
-        $templateNome = basename($request->template);
-        // O PDF nao é gerado quando recebe o nome do template via request
-        $templatePath = storage_path("app/templates/template_certificado_1.pdf");
-        Log::info("Caminho do template: " . $templatePath);
+        $templatePath = storage_path("app/templates/" . $templateNome);
         
         if (!file_exists($templatePath)) {
             Log::error("Template não encontrado: " . $templatePath);

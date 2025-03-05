@@ -44,7 +44,8 @@ async function processMessages() {
                 template_path: body.template_path,
                 hash: body.hash,
                 email: body.email,
-                certificado_path: body.certificado_path
+                certificado_path: body.certificado_path,
+                template_nome: body.template_nome
               }),
             });
 
