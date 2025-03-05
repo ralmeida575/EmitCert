@@ -11,7 +11,7 @@ const sqs = new SQSClient({
 });
 
 async function processMessages() {
-  console.log("🚀 Iniciando consumo da fila...");
+  console.log("Iniciando consumo da fila...");
 
   while (true) {
     const command = new ReceiveMessageCommand({
@@ -26,7 +26,7 @@ async function processMessages() {
       if (response.Messages && response.Messages.length > 0) {
         for (const message of response.Messages) {
           try {
-            console.log("📩 Mensagem recebida:", message.Body);
+            console.log("Mensagem recebida:", message.Body);
             const body = JSON.parse(message.Body);
 
             // Certifique-se de enviar os dados completos esperados pelo Laravel
@@ -74,6 +74,7 @@ async function processMessages() {
       console.error("Erro ao buscar mensagens na fila:", error);
     }
   }
+
 }
 
 processMessages();

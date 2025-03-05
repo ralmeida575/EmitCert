@@ -69,9 +69,7 @@ class ControllerCert extends Controller
             $erros = [];
     
             foreach (array_slice($dados[0], 1) as $index => $linha) {
-                Log::info('Linha recebida: ', $linha);
                 if (empty(array_filter($linha))) {
-                    Log::info('Linha vazia, ignorada.');
                     continue;
                 }
 
@@ -79,7 +77,7 @@ class ControllerCert extends Controller
                 empty($linha[0]) || empty($linha[1]) || empty($linha[3]) || empty($linha[4]) || empty($linha[5]) || empty($linha[6])) {
                 Log::info('Linha com dados insuficientes: ', $linha);
                 $erros[] = [
-                    'linha' => $index + 2, // Adiciona 2 para representar a linha correta no Excel (começando em 1 e considerando o cabeçalho)
+                    'linha' => $index + 2, // Adiciona 2 para representar a linha correta no Excel 
                     'nome' => $linha[0] ?? 'N/A',
                     'curso' => $linha[1] ?? 'N/A',
                     'erro' => 'Dados insuficientes'
@@ -159,6 +157,7 @@ class ControllerCert extends Controller
                 'status' => 'pendente',
                 'dataArquivo' => now(),
             ]);
+            Log::info('Status: pendente');
     
             return response()->json([
                 'status' => 'success',
@@ -265,7 +264,7 @@ class ControllerCert extends Controller
         }
 
         $payload['qr_code_url'] = $payload['qr_code_path'] ?? null;
-            
+
         try {
             $result = $this->sqsClient->sendMessage([
                 'QueueUrl' => $this->queueUrl,
@@ -281,11 +280,13 @@ class ControllerCert extends Controller
 {
  
     $templateNome = $request->input('template_nome');
-    Log::info("Template nome final: " . $templateNome);
-
     $data = $request->all();
-
     $email = $data['email'] ?? null;
+    $arquivoUuid = (string) $request->input('arquivo_uuid');
+    $atualizados = EmissaoCertificadoArquivo::where('arquivo_uuid', $arquivoUuid)
+    ->update(['status' => 'em_processamento']);
+    Log::info('Status: em_processamento');
+
 
     if (!$email) {
         Log::error('E-mail não encontrado no payload.');
@@ -301,12 +302,7 @@ class ControllerCert extends Controller
 
     Log::info('Webhook recebido:', $request->all());
 
-    $arquivoUuid = (string) $request->input('arquivo_uuid');
-    Log::info("UUID recebido: " . $arquivoUuid . " (Tipo: " . gettype($arquivoUuid) . ")");
-    $arquivoUuid = (string) $arquivoUuid;
-
-    $atualizados = EmissaoCertificadoArquivo::where('arquivo_uuid', $arquivoUuid)
-    ->update(['status' => 'em_processamento']);
+    
 
         $templatePath = storage_path("app/templates/" . $templateNome);
         
@@ -341,7 +337,9 @@ class ControllerCert extends Controller
         } catch (\Exception $e) {
             Log::error('Erro ao enviar e-mail para ' . $email . ': ' . $e->getMessage());
         }
-        
+        $atualizados = EmissaoCertificadoArquivo::where('arquivo_uuid', $arquivoUuid)
+        ->update(['status' => 'concluido']);
+        Log::info('Status: concluido');
     return response()->json([
         'message' => 'Certificado gerado e enviado com sucesso!',
         'path' => $outputPath   
