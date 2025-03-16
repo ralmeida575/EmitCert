@@ -2,7 +2,7 @@ import fetch from "node-fetch";
 import { SQSClient, ReceiveMessageCommand, DeleteMessageCommand } from "@aws-sdk/client-sqs";
 
 const LARAVEL_WEBHOOK_URL = "http://localhost:8000/webhook/certificados-processados";
-const queueUrl = "http://localhost:9324/000000000000/certificados";
+const queueUrl = "http://localhost:9324/000000000000/default";
 
 const sqs = new SQSClient({
   region: "us-east-1",
@@ -29,7 +29,6 @@ async function processMessages() {
             console.log("Mensagem recebida:", message.Body);
             const body = JSON.parse(message.Body);
 
-            // Certifique-se de enviar os dados completos esperados pelo Laravel
             const webhookResponse = await fetch(LARAVEL_WEBHOOK_URL, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
@@ -55,7 +54,6 @@ async function processMessages() {
               console.error("Erro ao enviar para o Laravel:", await webhookResponse.text());
             }
 
-            // Remover a mensagem da fila após processar
             await sqs.send(new DeleteMessageCommand({
               QueueUrl: queueUrl,
               ReceiptHandle: message.ReceiptHandle,

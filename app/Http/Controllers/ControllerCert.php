@@ -40,7 +40,7 @@ class ControllerCert extends Controller
             ],
         ]);
         
-        $this->queueUrl = env('AWS_SQS_QUEUE', 'http://localhost:9324/000000000000/certificados');
+        $this->queueUrl = env('AWS_SQS_QUEUE', 'http://localhost:9324/000000000000/default');
     }
 
     public function gerarCertificados(Request $request)
@@ -331,7 +331,6 @@ class ControllerCert extends Controller
         ->update(['certificado_path' => $outputPath]);
 
         try {
-            // Enviar o e-mail com o certificado gerado
             Mail::to($email)->send(new CertificadoEnviado($data['nome'], $data['curso'], $outputPath, $data['hash']));
             Log::info('E-mail enviado para: ' . $email);
         } catch (\Exception $e) {
